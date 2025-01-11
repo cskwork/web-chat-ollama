@@ -140,18 +140,22 @@ body {
     margin-bottom: 1rem;
     padding: 1rem;
     border-radius: 8px;
-    max-width: 80%;
+    max-width: 100%;
     animation: fadeIn 0.3s ease-in-out;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .message.user {
     background: var(--accent-color);
     margin-left: auto;
+    font-size: 1.0rem;
 }
 
 .message.assistant {
     background: var(--glass-bg);
     margin-right: auto;
+    font-size: 1.0rem;
 }
 
 .message.error {
