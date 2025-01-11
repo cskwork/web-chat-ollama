@@ -1,0 +1,419 @@
+:root {
+    /* Dark theme (default) */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent-color: #7289da;
+    --error-color: #ff4444;
+    --success-color: #44ff44;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --code-bg: #2d2d2d;
+    --code-text: #ffffff;
+}
+
+:root[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --glass-bg: rgba(0, 0, 0, 0.05);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --code-bg: #f0f0f0;
+    --code-text: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.app-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    height: 100vh;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Settings Panel Styles */
+.settings-panel {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-panel > div {
+    margin-bottom: 1.5rem;
+}
+
+.settings-panel label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.action-buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.danger-button {
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.danger-button:hover {
+    opacity: 0.9;
+}
+
+.secondary-button {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.secondary-button:hover {
+    background-color: var(--glass-bg);
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.theme-toggle button {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle button:hover {
+    background: var(--accent-color);
+}
+
+/* Chat Area Styles */
+.chat-area {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    max-width: 80%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.message.user {
+    background: var(--accent-color);
+    margin-left: auto;
+}
+
+.message.assistant {
+    background: var(--glass-bg);
+    margin-right: auto;
+}
+
+.message.error {
+    background: var(--error-color);
+    color: white;
+}
+
+.message .timestamp {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* Markdown Styles */
+.message.assistant .content {
+    line-height: 1.5;
+}
+
+.message.assistant .content code {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+.message.assistant .content pre {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.message.assistant .content pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+.message.assistant .content p {
+    margin: 0.5rem 0;
+}
+
+.message.assistant .content ul,
+.message.assistant .content ol {
+    margin: 0.5rem 0;
+    padding-left: 2rem;
+}
+
+.message.assistant .content blockquote {
+    border-left: 4px solid #666;
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+    color: #aaa;
+}
+
+.message.assistant .content a {
+    color: #58a6ff;
+    text-decoration: none;
+}
+
+.message.assistant .content a:hover {
+    text-decoration: underline;
+}
+
+/* Input Area Styles */
+.input-area {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--glass-border);
+}
+
+#user-input {
+    flex-grow: 1;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.8rem;
+    color: var(--text-primary);
+    resize: none;
+    min-height: 44px;
+    max-height: 200px;
+}
+
+#send-message {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#send-message:hover {
+    background: color-mix(in srgb, var(--accent-color) 80%, white);
+}
+
+#send-message svg {
+    fill: white;
+}
+
+/* History Panel Styles */
+.history-panel {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    width: 300px;
+    height: calc(100vh - 2rem);
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+}
+
+.history-panel.hidden {
+    transform: translateX(120%);
+}
+
+.history-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.close-button:hover {
+    background-color: var(--glass-bg);
+}
+
+.history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.history-item {
+    padding: 0.75rem;
+    background: var(--glass-bg);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.history-item:hover {
+    background-color: var(--bg-primary);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal:not([hidden]) {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal h3 {
+    margin-bottom: 1rem;
+    color: var(--error-color);
+}
+
+.modal button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.modal button:hover {
+    background: color-mix(in srgb, var(--accent-color) 80%, white);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+
+    .settings-panel {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+}
+
+/* Accessibility */
+:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+/* Loading States */
+.loading::after {
+    content: '...';
+    animation: ellipsis 1.5s infinite;
+}
+
+@keyframes ellipsis {
+    0% { content: '.'; }
+    33% { content: '..'; }
+    66% { content: '...'; }
+}

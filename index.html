@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Chat Agent</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Settings Panel -->
+        <aside class="settings-panel">
+            <h2>Settings</h2>
+            <div class="model-selection">
+                <label for="model-select">Model:</label>
+                <select id="model-select">
+                    <option value="">Loading models...</option>
+                </select>
+            </div>
+            <div class="temperature-control">
+                <label for="temperature">Temperature (0-2):</label>
+                <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                <span id="temperature-value">0.7</span>
+            </div>
+            <div class="context-length">
+                <label for="context-length">Context Length:</label>
+                <input type="number" id="context-length" min="512" max="8192" value="4096">
+            </div>
+            <div class="system-prompt">
+                <label for="system-prompt">System Prompt:</label>
+                <textarea id="system-prompt" rows="4"></textarea>
+                <div class="preset-prompts">
+                    <select id="preset-prompts">
+                        <option value="">Select Preset...</option>
+                    </select>
+                    <button id="save-prompt">Save</button>
+                </div>
+            </div>
+            <div class="theme-toggle">
+                <label>Theme:</label>
+                <button id="theme-toggle">Toggle Dark/Light</button>
+            </div>
+            <div class="action-buttons">
+                <button id="reset-chat" class="danger-button">Reset Chat</button>
+                <button id="toggle-history" class="secondary-button">Chat History</button>
+            </div>
+        </aside>
+
+        <!-- History Panel -->
+        <div id="history-panel" class="history-panel hidden">
+            <div class="history-header">
+                <h2>Chat History</h2>
+                <button id="close-history" class="close-button">×</button>
+            </div>
+            <div class="history-list"></div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <div id="chat-messages" class="messages"></div>
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Type your message..." rows="1"></textarea>
+                <button id="send-message" aria-label="Send message">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal" hidden>
+        <div class="modal-content">
+            <h3>Error</h3>
+            <p id="error-message"></p>
+            <button id="close-error">Close</button>
+        </div>
+    </div>
+
+    <script src="js/marked.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/agent.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>
