@@ -4,23 +4,23 @@
     --bg-secondary: #2d2d2d;
     --text-primary: #ffffff;
     --text-secondary: #b3b3b3;
-    --accent-color: #7289da;
+    --accent-color: #c7d3ff;
     --error-color: #ff4444;
     --success-color: #44ff44;
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
-    --code-bg: #2d2d2d;
+    --code-bg: #63e4f7;
     --code-text: #ffffff;
 }
 
 :root[data-theme="light"] {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f5f5f5;
+    --bg-primary: #fffcfc;
+    --bg-secondary: #fffcfc;
     --text-primary: #333333;
     --text-secondary: #666666;
     --glass-bg: rgba(0, 0, 0, 0.05);
     --glass-border: rgba(0, 0, 0, 0.1);
-    --code-bg: #f0f0f0;
+    --code-bg: #63e4f7;
     --code-text: #333333;
 }
 
