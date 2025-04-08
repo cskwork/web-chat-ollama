@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ollama Chat Agent</title>
+    <title>LightRAG Chat Agent</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="dark-theme">
@@ -11,7 +11,14 @@
         <!-- Settings Panel -->
         <aside class="settings-panel">
             <h2>Settings</h2>
-            <div class="model-selection">
+            <div class="api-selection">
+                <label for="api-select">API:</label>
+                <select id="api-select">
+                    <option value="lightrag">LightRAG</option>
+                    <option value="ollama">Ollama</option>
+                </select>
+            </div>
+            <div id="model-container" class="model-selection">
                 <label for="model-select">Model:</label>
                 <select id="model-select">
                     <option value="">Loading models...</option>
@@ -19,10 +26,10 @@
             </div>
             <div class="temperature-control">
                 <label for="temperature">Temperature (0-2):</label>
-                <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
-                <span id="temperature-value">0.7</span>
+                <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.5">
+                <span id="temperature-value">0.5</span>
             </div>
-            <div class="context-length">
+            <div id="context-container" class="context-length">
                 <label for="context-length">Context Length:</label>
                 <input type="number" id="context-length" min="512" max="8192" value="4096">
             </div>
@@ -81,6 +88,7 @@
     <script src="js/marked.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/agent.js"></script>
+    <script src="js/lightrag.js"></script>
     <script src="js/chat.js"></script>
 </body>
 </html>

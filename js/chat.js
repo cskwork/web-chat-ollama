@@ -1,11 +1,22 @@
 class ChatInterface {
     constructor() {
-        this.agent = new OllamaAgent();
+        this.apiType = 'lightrag'; // Default to LightRAG
+        this.agent = this.createAgent(this.apiType);
         this.isGenerating = false;
         this.initializeDOM();
         this.setupAgent();
         this.loadPresetPrompts();
         this.bindEvents();
+    }
+
+    createAgent(type) {
+        switch (type) {
+            case 'ollama':
+                return new OllamaAgent();
+            case 'lightrag':
+            default:
+                return new LightRagAgent();
+        }
     }
 
     initializeDOM() {
@@ -15,7 +26,10 @@ class ChatInterface {
         this.sendButton = document.getElementById('send-message');
 
         // Settings elements
+        this.apiSelect = document.getElementById('api-select');
         this.modelSelect = document.getElementById('model-select');
+        this.modelContainer = document.getElementById('model-container');
+        this.contextContainer = document.getElementById('context-container');
         this.temperatureInput = document.getElementById('temperature');
         this.temperatureValue = document.getElementById('temperature-value');
         this.contextLengthInput = document.getElementById('context-length');
@@ -34,17 +48,32 @@ class ChatInterface {
         this.errorModal = document.getElementById('error-modal');
         this.errorMessage = document.getElementById('error-message');
         this.closeErrorButton = document.getElementById('close-error');
+
+        // Update UI based on initial API type
+        this.updateUIForApiType(this.apiType);
+    }
+
+    updateUIForApiType(apiType) {
+        if (apiType === 'lightrag') {
+            // LightRAG doesn't use these settings
+            this.modelContainer.style.display = 'none';
+            this.contextContainer.style.display = 'none';
+        } else {
+            // Ollama needs these settings
+            this.modelContainer.style.display = 'block';
+            this.contextContainer.style.display = 'block';
+        }
     }
 
     async setupAgent() {
         try {
             const models = await this.agent.initialize();
             if (!models || models.length === 0) {
-                throw new Error('No Ollama models found. Please make sure Ollama is running and you have models installed.');
+                throw new Error(`No ${this.apiType === 'ollama' ? 'Ollama' : 'LightRAG'} models found. Please make sure the API is running and accessible.`);
             }
             this.updateModelSelect(models);
         } catch (error) {
-            this.showError('Failed to initialize Ollama agent: ' + error.message);
+            this.showError(`Failed to initialize ${this.apiType === 'ollama' ? 'Ollama' : 'LightRAG'} agent: ${error.message}`);
         }
     }
 
@@ -53,12 +82,26 @@ class ChatInterface {
             .map(model => `<option value="${model}">${model}</option>`)
             .join('');
         
-        if (models.length > 0) {
+        if (models.length > 0 && this.apiType === 'ollama') {
             this.agent.setModel(models[0]);
         }
     }
 
     bindEvents() {
+        // API selection event
+        if (this.apiSelect) {
+            this.apiSelect.addEventListener('change', this.handleApiChange.bind(this));
+            // Set initial value based on stored preference
+            const savedApiType = localStorage.getItem('apiType') || 'lightrag';
+            this.apiSelect.value = savedApiType;
+            if (savedApiType !== this.apiType) {
+                this.apiType = savedApiType;
+                this.agent = this.createAgent(this.apiType);
+                this.updateUIForApiType(this.apiType);
+                this.setupAgent();
+            }
+        }
+
         // Message events
         this.userInput.addEventListener('keydown', this.handleKeyPress.bind(this));
         this.userInput.addEventListener('input', this.autoResizeInput.bind(this));
@@ -89,8 +132,23 @@ class ChatInterface {
         // Error modal events
         this.closeErrorButton.addEventListener('click', () => this.errorModal.hidden = true);
 
+        // Listen for error events from both agent types
+        window.addEventListener('ollama-error', (e) => this.showError(e.detail.error));
+        window.addEventListener('lightrag-error', (e) => this.showError(e.detail.error));
+
         // Auto-resize the input on page load
         this.autoResizeInput();
+    }
+
+    handleApiChange(event) {
+        const newApiType = event.target.value;
+        if (newApiType !== this.apiType) {
+            this.apiType = newApiType;
+            localStorage.setItem('apiType', this.apiType);
+            this.agent = this.createAgent(this.apiType);
+            this.updateUIForApiType(this.apiType);
+            this.setupAgent();
+        }
     }
 
     // Message handling methods
@@ -100,7 +158,7 @@ class ChatInterface {
         const message = this.userInput.value.trim();
         this.userInput.value = '';
         this.autoResizeInput();
-        this.addMessage('assistant', message);
+        this.addMessage('user', message, true);
         this.isGenerating = true;
 
         try {
@@ -115,7 +173,8 @@ class ChatInterface {
             });
             console.log('Chat response completed');
         } catch (error) {
-            this.showError('Failed to send message');
+            console.error('Error sending message:', error);
+            this.showError(`Failed to send message: ${error.message}`);
         } finally {
             this.isGenerating = false;
         }
@@ -127,7 +186,12 @@ class ChatInterface {
         const contentDiv = document.createElement('div');
         contentDiv.className = 'content';
         
-        contentDiv.textContent = content;
+        if (isUser) {
+            contentDiv.textContent = content;
+        } else {
+            // For assistant messages, use markdown
+            contentDiv.innerHTML = content ? marked.parse(content) : '';
+        }
 
         const timestampDiv = document.createElement('div');
         timestampDiv.className = 'timestamp';
@@ -177,7 +241,9 @@ class ChatInterface {
 
     // Settings handlers
     handleModelChange(event) {
-        this.agent.setModel(event.target.value);
+        if (this.apiType === 'ollama') {
+            this.agent.setModel(event.target.value);
+        }
     }
 
     handleTemperatureChange(event) {
@@ -188,7 +254,7 @@ class ChatInterface {
 
     handleContextLengthChange(event) {
         const value = parseInt(event.target.value);
-        if (!isNaN(value) && value >= 512 && value <= 8192) {
+        if (!isNaN(value) && value >= 512 && value <= 8192 && this.apiType === 'ollama') {
             this.agent.setContextLength(value);
         }
     }
@@ -315,7 +381,22 @@ class ChatInterface {
             chat.messages.forEach(msg => {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = msg.type === 'assistant' ? 'message assistant' : 'message user';
-                messageDiv.innerHTML = `<div class="content">${msg.content}</div><div class="timestamp">${utils.formatTimestamp(new Date())}</div>`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'content';
+                
+                if (msg.type === 'assistant') {
+                    contentDiv.innerHTML = marked.parse(msg.content);
+                } else {
+                    contentDiv.textContent = msg.content;
+                }
+                
+                const timestampDiv = document.createElement('div');
+                timestampDiv.className = 'timestamp';
+                timestampDiv.textContent = utils.formatTimestamp(new Date());
+                
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(timestampDiv);
                 this.messagesContainer.appendChild(messageDiv);
             });
             this.toggleHistory();
