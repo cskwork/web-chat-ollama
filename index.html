@@ -8,7 +8,29 @@
 </head>
 <body class="dark-theme">
     <div class="app-container">
-        <!-- Settings Panel -->
+        <!-- History Panel -->
+        <div id="history-panel" class="history-panel hidden">
+            <div class="history-header">
+                <h2>Chat History</h2>
+                <button id="close-history" class="close-button">×</button>
+            </div>
+            <div class="history-list"></div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <div id="chat-messages" class="messages"></div>
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Type your message..." rows="1"></textarea>
+                <button id="send-message" aria-label="Send message">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+           <!-- Settings Panel -->
         <aside class="settings-panel">
             <h2>Settings</h2>
             <div class="api-selection">
@@ -52,28 +74,6 @@
                 <button id="toggle-history" class="secondary-button">Chat History</button>
             </div>
         </aside>
-
-        <!-- History Panel -->
-        <div id="history-panel" class="history-panel hidden">
-            <div class="history-header">
-                <h2>Chat History</h2>
-                <button id="close-history" class="close-button">×</button>
-            </div>
-            <div class="history-list"></div>
-        </div>
-
-        <!-- Main Chat Area -->
-        <main class="chat-area">
-            <div id="chat-messages" class="messages"></div>
-            <div class="input-area">
-                <textarea id="user-input" placeholder="Type your message..." rows="1"></textarea>
-                <button id="send-message" aria-label="Send message">
-                    <svg viewBox="0 0 24 24" width="24" height="24">
-                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
-                    </svg>
-                </button>
-            </div>
-        </main>
     </div>
 
     <!-- Error Modal -->
