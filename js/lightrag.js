@@ -16,16 +16,17 @@ class LightRagAgent {
             const response = await fetch(`${this.baseUrl}/health`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
-            });
+            }).catch(() => ({ ok: false }));
             
             if (!response.ok) {
-                throw new Error('LightRAG API is not accessible');
+                console.warn('LightRAG health check failed, but continuing anyway');
             }
             
             return ['LightRAG']; // Return a default model name for UI compatibility
         } catch (error) {
             this.handleError('Failed to initialize LightRAG agent', error);
-            throw error;
+            // Don't throw, we'll try to continue anyway
+            return ['LightRAG'];
         }
     }
     
@@ -72,18 +73,72 @@ class LightRagAgent {
             const reader = response.body.getReader();
             let fullResponse = '';
             let buffer = '';
+            let jsonBuffer = '';
+
+            const decoder = new TextDecoder();
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                // Decode the chunk and add to the buffer
-                const textChunk = new TextDecoder().decode(value);
+                // Decode the chunk
+                const textChunk = decoder.decode(value, { stream: true });
                 buffer += textChunk;
                 
-                // Process the received chunk directly
-                fullResponse += textChunk;
-                onChunk?.(textChunk);
+                // Process JSON objects from the buffer
+                let startIndex = 0;
+                while (startIndex < buffer.length) {
+                    // Find JSON object boundaries
+                    const openBrace = buffer.indexOf('{', startIndex);
+                    if (openBrace === -1) break;
+                    
+                    // Find the closing brace
+                    let closeBrace = buffer.indexOf('}', openBrace);
+                    if (closeBrace === -1) break;
+                    
+                    // Extract the JSON string
+                    const jsonStr = buffer.substring(openBrace, closeBrace + 1);
+                    startIndex = closeBrace + 1;
+                    
+                    try {
+                        // Parse the JSON object
+                        const jsonObj = JSON.parse(jsonStr);
+                        if (jsonObj.response !== undefined) {
+                            // Extract the actual response
+                            fullResponse += jsonObj.response;
+                            onChunk?.(jsonObj.response);
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse JSON chunk:', e);
+                        console.debug('Problematic JSON:', jsonStr);
+                    }
+                }
+                
+                // Keep any remaining data in the buffer
+                buffer = buffer.substring(startIndex);
+            }
+
+            // Process any remaining complete JSON in the buffer
+            if (buffer.length > 0) {
+                try {
+                    // Try to find any remaining JSON objects
+                    const matches = buffer.match(/{[^}]*}/g);
+                    if (matches) {
+                        for (const match of matches) {
+                            try {
+                                const jsonObj = JSON.parse(match);
+                                if (jsonObj.response !== undefined) {
+                                    fullResponse += jsonObj.response;
+                                    onChunk?.(jsonObj.response);
+                                }
+                            } catch (e) {
+                                console.error('Failed to parse remaining JSON:', e);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error processing remaining buffer:', e);
+                }
             }
 
             // Update conversation history
